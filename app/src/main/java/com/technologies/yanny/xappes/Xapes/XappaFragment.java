@@ -63,6 +63,32 @@ public class XappaFragment extends Fragment {
         ((HomeActivity) getActivity()).showProgress(false);
 
         chargeXappa(this.xappa);
+
+        this.bt_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadSelectCavaFragment();
+            }
+        });
+        this.bt_exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onDetach();
+            }
+        });
+    }
+
+    private void loadSelectCavaFragment(){
+        CrearXapaFragment newFragment = new CrearXapaFragment();
+        Bundle args = new Bundle();
+        ((HomeActivity) getActivity()).setProgressB(25);
+
+        args.putString("cava", this.xappa.getCavaName());
+        args.putString("xappaId", this.xappa.getXapesId());
+
+        ((HomeActivity) getActivity()).setProgressB(70);
+        newFragment.setArguments(args);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
     }
 
     private void chargeXappa(XapesDO xappa) {
@@ -96,6 +122,7 @@ public class XappaFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        getActivity().getSupportFragmentManager().beginTransaction().remove(this).commit();
     }
 
     public interface OnFragmentInteractionListener {

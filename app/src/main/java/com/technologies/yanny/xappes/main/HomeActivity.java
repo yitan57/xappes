@@ -49,7 +49,7 @@ public class HomeActivity extends AppCompatActivity {
         setOption("inici");
     }
 
-    private boolean getMenuActivity(MenuItem item) {
+    public boolean getMenuActivity(MenuItem item) {
         return MenuNavigator.getMenuActivity(item, this, getSupportFragmentManager());
     }
 

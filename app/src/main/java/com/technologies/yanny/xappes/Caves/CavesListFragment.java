@@ -44,7 +44,7 @@ public class CavesListFragment extends Fragment {
 
     private com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper dynamoDBMapper;
 
-    private String[] index = {"A","B","C","D","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","V","W","X","Y","Z"};
+    private String[] index = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","V","W","X","Y","Z"};
 
     public CavesListFragment() {
     }
@@ -85,7 +85,7 @@ public class CavesListFragment extends Fragment {
 
                 Condition condition = new Condition()
                         .withComparisonOperator(ComparisonOperator.BEGINS_WITH)
-                        .withAttributeValueList(new AttributeValue(selected));
+                        .withAttributeValueList(new AttributeValue(selected.toLowerCase()));
                 scanExpression.addFilterCondition("cavaName", condition);
 
                 List<CavesDO> cavesResult = dynamoDBMapper.scan(CavesDO.class, scanExpression);

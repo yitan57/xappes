@@ -46,7 +46,7 @@ public class Cava {
                         args.putString("cava", name);
                         newFragment.setArguments(args);
                         ((HomeActivity) context).setProgressB(90);
-                        fragment.beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
+                        fragment.beginTransaction().add(R.id.fl_main_fragment, newFragment).commit();
                     }
                 }
         );

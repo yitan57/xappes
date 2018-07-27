@@ -126,6 +126,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mGoogleMap.setMyLocationEnabled(true);
             } else {
                 //Request Location Permission
+                ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_FINE_LOCATION);
                 checkLocationPermission();
             }
         }

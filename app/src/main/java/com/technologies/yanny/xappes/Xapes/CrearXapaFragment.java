@@ -1,8 +1,10 @@
 package com.technologies.yanny.xappes.Xapes;
 
+import android.Manifest;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,11 +59,11 @@ public class CrearXapaFragment extends Fragment {
     private String user;
     private String codigoFinal;
 
-    private boolean xapaSelected = false;
     private boolean isOk = false;
 
+    private File pictureFile;
+
     private Uri picUri;
-    private Bitmap picture;
 
     private TextView et_repetides;
     private TextView et_venda;
@@ -177,6 +180,11 @@ public class CrearXapaFragment extends Fragment {
         setImage(this.xapaId);
         setCava(this.cavaName);
         this.ll_la_meva_coleccio.setVisibility(View.VISIBLE);
+        this.tv_codigo.setText(this.xapaId);
+        this.user = ((HomeActivity) getActivity()).getUsuari();
+        this.codigoFinal = this.xapaId;
+        this.tv_usuari.setText(this.user);
+        getCava();
     }
 
     private void loadSelectCavaFragment() {
@@ -203,27 +211,13 @@ public class CrearXapaFragment extends Fragment {
         }
     }
 
-    private File getImageUri(Bitmap image) {
-        File file = new File(Environment.getExternalStorageDirectory() + "/myimage.png");
-        FileOutputStream fOut = null;
-        try {
-            fOut = new FileOutputStream(file);
-            image.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-        } catch (FileNotFoundException e) {
-            Toast.makeText(getActivity(), "Error guardando imagen", Toast.LENGTH_SHORT);
-        } finally {
-            try {
-                fOut.close();
-            } catch (IOException e) {
-                Toast.makeText(getActivity(), "Error guardando imagen", Toast.LENGTH_SHORT);
-            }
-        }
-        return file;
-    }
-
     private void saveImage(String id) {
         S3Transfer s3 = new S3Transfer();
-        s3.uploadData(getActivity(), getImageUri(this.picture), getResources().getString(R.string.xappesDirectory)+ id + ".jpg");
+        //File newFile = getImageUri(this.picture);
+        if (this.pictureFile != null) s3.uploadData(getActivity(), this.pictureFile, getResources().getString(R.string.xappesDirectory)+ id + ".jpg");
+        else ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, new CrearXapaFragment()).commit();
     }
 
     private void setImage(String id) {
@@ -239,12 +233,12 @@ public class CrearXapaFragment extends Fragment {
         newsItem.setCavaName(nameCava.toLowerCase());
         newsItem.setUserId(user);
 
-        /*new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 dynamoDBMapper.save(newsItem);
             }
-        }).start();*/
+        }).start();
 
         final CavesDO newsItemCava = cava;
 
@@ -253,12 +247,12 @@ public class CrearXapaFragment extends Fragment {
 
         newsItemCava.setNumXappes(String.valueOf(numXappes));
 
-        /*new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 dynamoDBMapper.save(newsItemCava);
             }
-        }).start();*/
+        }).start();
 
         saveImage(xapaId);
 
@@ -267,7 +261,7 @@ public class CrearXapaFragment extends Fragment {
     private void loadChargeXapasFragment() {
         ((HomeActivity) getActivity()).showProgress(true);
         ((HomeActivity) getActivity()).setProgressB(50);
-        if (this.cavaName == null) getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, new XapesListFragment()).commit();
+        if (this.cavaName == null) getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_main_fragment, new XapesListFragment()).commit();
         else {
             XapesListFragment newFragment = new XapesListFragment();
             Bundle args = new Bundle();
@@ -302,9 +296,10 @@ public class CrearXapaFragment extends Fragment {
                 try {// get the returned data
                     Bundle extras = data.getExtras();
                     // get the cropped bitmap
-                    Bitmap thePic = extras.getParcelable("data");
+                    Bitmap thePic = (Bitmap) extras.get("data");
                     this.iv_picture.setImageBitmap(thePic);
-                    this.picture = thePic;
+
+                    this.pictureFile = new File(getRealPathFromURI(this.picUri));
                     prepareNewXappa();
 
                 } catch (Exception e) {
@@ -314,6 +309,13 @@ public class CrearXapaFragment extends Fragment {
         } else {
             Toast.makeText(getActivity(), "Error",Toast.LENGTH_LONG).show();
         }
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        Cursor cursor = getActivity().getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
     }
 
     private void prepareNewXappa() {
@@ -336,9 +338,36 @@ public class CrearXapaFragment extends Fragment {
 
     }
 
+    private void getCava() {
+        this.isOk = false;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
+
+                String value = tv_cava.getText().toString();
+
+                Condition condition;
+
+                condition = new Condition()
+                        .withComparisonOperator(ComparisonOperator.EQ)
+                        .withAttributeValueList(new AttributeValue(value));
+                scanExpression.addFilterCondition("cavaName", condition);
+
+                List<CavesDO> cavesResult = dynamoDBMapper.scan(CavesDO.class, scanExpression);
+                System.out.println(cavesResult.toString());
+
+                if (cavesResult.size() > 0) cavaSelected = cavesResult.get(0);
+
+                isOk = true;
+            }
+        }).start();
+        while (!this.isOk);
+    }
+
     private String getNumId() {
         this.newId = "";
-
+        this.isOk = false;
         new Thread(new Runnable() {
             @Override
             public void run() {

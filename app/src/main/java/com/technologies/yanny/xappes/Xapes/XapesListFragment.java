@@ -106,7 +106,7 @@ public class XapesListFragment extends Fragment {
                         xappa.add(xapes.get(position));
                         args.putParcelableArrayList("xappa", (ArrayList) xappa);
                         newFragment.setArguments(args);
-                        getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_main_fragment, newFragment).commit();
+                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
                     }
                 }
             }
@@ -126,7 +126,7 @@ public class XapesListFragment extends Fragment {
                 if(cavaName != null) {
                     Condition condition = new Condition()
                             .withComparisonOperator(ComparisonOperator.EQ)
-                            .withAttributeValueList(new AttributeValue(cavaName));
+                            .withAttributeValueList(new AttributeValue(cavaName.toLowerCase()));
                     scanExpression.addFilterCondition("cavaName", condition);
                 }
 
@@ -148,6 +148,7 @@ public class XapesListFragment extends Fragment {
         ((HomeActivity) getActivity()).setProgressB(90);
         this.imagesList = new ArrayList<>();
         for (XapesDO cava : this.xapes) {
+            System.out.println(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg");
             this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
         }
         if (((HomeActivity) getActivity()).getOption().equals("crear") && this.cavaName != null) this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "add.png"));
