@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="200dp"
+    tools:context=".Trobades.TrobadesFragment">
+
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="200dp"
+        android:layout_gravity="center"
+        android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title_trobada"
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_weight=".015"
+            android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_descripcio_trobada"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".9"
+            android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+            android:textSize="10sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/bt_exit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|right|center"
+        android:clickable="true"
+        android:src="@android:drawable/ic_delete"
+        app:backgroundTint="@android:color/transparent"
+        app:elevation="0dp" />
+</FrameLayout>
