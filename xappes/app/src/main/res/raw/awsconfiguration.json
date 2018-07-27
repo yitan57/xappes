@@ -1,0 +1,43 @@
+{
+  "UserAgent": "MobileHub/1.0",
+  "Version": "1.0",
+  "CredentialsProvider": {
+    "CognitoIdentity": {
+      "Default": {
+        "PoolId": "us-east-2:00a43b68-706a-4d3e-b0f4-2622a10f3070",
+        "Region": "us-east-2"
+      }
+    }
+  },
+  "IdentityManager": {
+    "Default": {}
+  },
+  "S3TransferUtility": {
+    "Default": {
+      "Bucket": "xappes-userfiles-mobilehub-1241857271",
+      "Region": "us-east-2"
+    }
+  },
+  "DynamoDBObjectMapper": {
+    "Default": {
+      "Region": "us-east-2"
+    }
+  },
+  "PinpointAnalytics": {
+    "Default": {
+      "AppId": "927467ebd0ba4a369ca6ac9311e9840a",
+      "Region": "us-east-1"
+    }
+  },
+  "PinpointTargeting": {
+    "Default": {
+      "Region": "us-east-1"
+    }
+  },
+  "UserFileManager": {
+    "Default": {
+      "Bucket": "xappes-userfiles-mobilehub-1241857271",
+      "Region": "us-east-2"
+    }
+  }
+}
