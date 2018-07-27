@@ -106,7 +106,7 @@ public class XapesListFragment extends Fragment {
                         xappa.add(xapes.get(position));
                         args.putParcelableArrayList("xappa", (ArrayList) xappa);
                         newFragment.setArguments(args);
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
+                        getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_main_fragment, newFragment).commit();
                     }
                 }
             }
