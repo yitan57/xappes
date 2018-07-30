@@ -11,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
 import com.amazonaws.models.nosql.XapesDO;
@@ -32,8 +33,6 @@ public class XapesListFragment extends Fragment {
     private String cavaName;
 
     private GridView gv_xapes;
-
-    private boolean isOk = false;
 
     private List<RequestCreator> imagesList;
     private List<XapesDO> xapes;
@@ -115,9 +114,8 @@ public class XapesListFragment extends Fragment {
 
     private void searchXappes(final String value) {
         this.xapes = new ArrayList<>();
-        this.isOk = false;
 
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
@@ -136,25 +134,29 @@ public class XapesListFragment extends Fragment {
                 for (XapesDO cava : cavesResult) {
                     xapes.add(cava);
                 }
-
-                isOk = true;
             }
-        }).start();
-        loadXappes();
+        });
+        t.start();
+        loadXappes(t);
     }
 
-    private void loadXappes() {
-        while (!this.isOk);
-        ((HomeActivity) getActivity()).setProgressB(90);
-        this.imagesList = new ArrayList<>();
-        for (XapesDO cava : this.xapes) {
-            System.out.println(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg");
-            this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
+    private void loadXappes(Thread t) {
+        try {
+            t.join();
+            ((HomeActivity) getActivity()).setProgressB(90);
+            this.imagesList = new ArrayList<>();
+            for (XapesDO cava : this.xapes) {
+                System.out.println(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg");
+                this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
+            }
+            if (((HomeActivity) getActivity()).getOption().equals("crear") && this.cavaName != null) this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "add.png"));
+            if (((HomeActivity) getActivity()).getOption().equals("buscar") && this.xapes.size() == 0)this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "noInfo.png"));
+            this.gv_xapes.setAdapter(new ImageAdapterGridView(this.getActivity()));
+            ((HomeActivity) getActivity()).showProgress(false);
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }
-        if (((HomeActivity) getActivity()).getOption().equals("crear") && this.cavaName != null) this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "add.png"));
-        if (((HomeActivity) getActivity()).getOption().equals("buscar") && this.xapes.size() == 0)this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "noInfo.png"));
-        this.gv_xapes.setAdapter(new ImageAdapterGridView(this.getActivity()));
-        ((HomeActivity) getActivity()).showProgress(false);
+
     }
 
 

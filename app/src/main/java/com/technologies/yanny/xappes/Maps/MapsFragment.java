@@ -69,7 +69,6 @@ public class MapsFragment extends Fragment{
 
     private List<TrobadesDO> trobades;
     private String[] trobadesList;
-    private boolean isOk = false;
 
     private Button bt_map;
 
@@ -145,9 +144,7 @@ public class MapsFragment extends Fragment{
 
     private void searchTrobades() {
         this.trobades = new ArrayList<>();
-        isOk = false;
-
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
@@ -160,27 +157,31 @@ public class MapsFragment extends Fragment{
                 for (TrobadesDO trobada : trobadesResult) {
                     trobades.add(trobada);
                 }
-
-                isOk = true;
             }
-        }).start();
-        loadTrobades();
+        });
+        t.start();
+        loadTrobades(t);
     }
 
-    private void loadTrobades() {
-        while (!this.isOk);
-        ((HomeActivity) getActivity()).setProgressB(90);
+    private void loadTrobades(Thread t) {
+        try {
+            t.join();
+            ((HomeActivity) getActivity()).setProgressB(90);
 
-        this.trobadesList = new String[this.trobades.size()*2];
-        int j = 0;
-        for (int i = 0; i < this.trobades.size(); i++) {
-            this.trobadesList[j] = this.trobades.get(i).getTrobadaTitle() + " (" + this.trobades.get(i).getTrobadaData() + ")";
-            this.trobadesList[j+1] = this.trobades.get(i).getTrobadaText();
-            j+=2;
+            this.trobadesList = new String[this.trobades.size()*2];
+            int j = 0;
+            for (int i = 0; i < this.trobades.size(); i++) {
+                this.trobadesList[j] = this.trobades.get(i).getTrobadaTitle() + " (" + this.trobades.get(i).getTrobadaData() + ")";
+                this.trobadesList[j+1] = this.trobades.get(i).getTrobadaText();
+                j+=2;
+            }
+
+            this.gv_trobades.setAdapter(new TrobadesAdapter(this.getActivity()));
+            ((HomeActivity) getActivity()).showProgress(false);
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }
 
-        this.gv_trobades.setAdapter(new TrobadesAdapter(this.getActivity()));
-        ((HomeActivity) getActivity()).showProgress(false);
     }
 
     public class TrobadesAdapter extends BaseAdapter {

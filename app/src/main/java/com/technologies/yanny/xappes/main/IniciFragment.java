@@ -14,6 +14,7 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
 import com.amazonaws.models.nosql.EntradasDO;
@@ -35,8 +36,6 @@ public class IniciFragment extends Fragment {
     private TabLayout tabs;
 
     private String type;
-
-    private boolean isOk = false;
 
     private String[] textosEntradas;
     private List<EntradasDO> entradas;
@@ -93,25 +92,31 @@ public class IniciFragment extends Fragment {
         getEntradas("NOVETATS");
     }
 
-    private void chargeEntradas() {
-        while (!this.isOk);
-        this.textosEntradas = new String[this.entradas.size()];
+    private void chargeEntradas(Thread t) {
+        try {
+            t.join();
 
-        for (int i = 0; i < this.entradas.size(); i++) {
-            this.textosEntradas[i] = this.entradas.get(i).getEntrada();
+            this.textosEntradas = new String[this.entradas.size()];
+
+            for (int i = 0; i < this.entradas.size(); i++) {
+                this.textosEntradas[i] = this.entradas.get(i).getEntrada();
+            }
+            this.gv_content.setAdapter(new HomeAdapter(this.getActivity()));
+
+            ((HomeActivity) getActivity()).showProgress(false);
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }
-        this.gv_content.setAdapter(new HomeAdapter(this.getActivity()));
 
-        ((HomeActivity) getActivity()).showProgress(false);
     }
 
     private void getEntradas(String valueType) {
         this.type = valueType;
         this.entradas = new ArrayList<>();
-        this.isOk = false;
 
         ((HomeActivity) getActivity()).setProgressB(75);
-        new Thread(new Runnable() {
+
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
@@ -131,11 +136,10 @@ public class IniciFragment extends Fragment {
                 for (EntradasDO aEntrada : cavesResult) {
                     entradas.add(aEntrada);
                 }
-
-                isOk = true;
             }
-        }).start();
-        chargeEntradas();
+        });
+        t.start();
+        chargeEntradas(t);
     }
 
     public class HomeAdapter extends BaseAdapter {

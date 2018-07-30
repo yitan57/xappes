@@ -59,8 +59,6 @@ public class CrearXapaFragment extends Fragment {
     private String user;
     private String codigoFinal;
 
-    private boolean isOk = false;
-
     private File pictureFile;
 
     private Uri picUri;
@@ -76,6 +74,8 @@ public class CrearXapaFragment extends Fragment {
     private Button bt_foto;
     private Button bt_save;
     private Button bt_select_cava;
+
+    private boolean increment;
 
     private ImageView iv_picture;
     private ImageView iv_picture2;
@@ -149,7 +149,7 @@ public class CrearXapaFragment extends Fragment {
         this.bt_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveNewXapa(cavaName, codigoFinal, user, cavaSelected);
+                saveNewXapa(cavaName, codigoFinal, user, cavaSelected, increment);
             }
         });
 
@@ -162,9 +162,11 @@ public class CrearXapaFragment extends Fragment {
 
         if (this.cavaName != null && this.xapaId != null) {
             if (this.xapaId.equals("-1")) {
+                this.increment = true;
                 setCava(this.cavaName);
                 toggleVisibleCamera(View.VISIBLE);
             } else {
+                this.increment = false;
                 chargeSelectedCava();
                 toggleVisibleCamera(View.GONE);
             }
@@ -226,7 +228,7 @@ public class CrearXapaFragment extends Fragment {
         Log.d("URL",getResources().getString(R.string.bucketURL)+id+".jpg");
     }
 
-    public void saveNewXapa(String nameCava, String xapaId, String user, CavesDO cava) {
+    public void saveNewXapa(String nameCava, String xapaId, String user, CavesDO cava, boolean increment) {
         final XapesDO newsItem = new XapesDO();
 
         newsItem.setXapesId(xapaId);
@@ -240,19 +242,21 @@ public class CrearXapaFragment extends Fragment {
             }
         }).start();
 
-        final CavesDO newsItemCava = cava;
+        if (increment) {
+            final CavesDO newsItemCava = cava;
 
-        int numXappes = Integer.parseInt(cava.getNumXappes());
-        numXappes++;
+            int numXappes = Integer.parseInt(cava.getNumXappes());
+            numXappes++;
 
-        newsItemCava.setNumXappes(String.valueOf(numXappes));
+            newsItemCava.setNumXappes(String.valueOf(numXappes));
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                dynamoDBMapper.save(newsItemCava);
-            }
-        }).start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    dynamoDBMapper.save(newsItemCava);
+                }
+            }).start();
+        }
 
         saveImage(xapaId);
 
@@ -339,8 +343,7 @@ public class CrearXapaFragment extends Fragment {
     }
 
     private void getCava() {
-        this.isOk = false;
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
@@ -358,17 +361,19 @@ public class CrearXapaFragment extends Fragment {
                 System.out.println(cavesResult.toString());
 
                 if (cavesResult.size() > 0) cavaSelected = cavesResult.get(0);
-
-                isOk = true;
             }
-        }).start();
-        while (!this.isOk);
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
+        }
     }
 
     private String getNumId() {
         this.newId = "";
-        this.isOk = false;
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
@@ -391,11 +396,16 @@ public class CrearXapaFragment extends Fragment {
                     newId = cavesResult.get(0).getNumXappes();
                     newCavaId = cavesResult.get(0).getCavaId();
                 }
-                isOk = true;
             }
-        }).start();
-        while (!this.isOk);
-        return this.newId;
+        });
+        t.start();
+        try {
+            t.join();
+            return this.newId;
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
+            return null;
+        }
     }
 
     private void performCrop() {

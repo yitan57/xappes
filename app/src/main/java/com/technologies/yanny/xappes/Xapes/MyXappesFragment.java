@@ -15,6 +15,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
 import com.amazonaws.models.nosql.CavesDO;
@@ -40,8 +41,6 @@ public class MyXappesFragment extends Fragment {
     private List<XapesDO> xapes;
 
     private String valueCache;
-
-    private boolean noOk;
 
     private GridView gv_les_meves_xapes;
 
@@ -72,8 +71,6 @@ public class MyXappesFragment extends Fragment {
 
         ((HomeActivity) getActivity()).showProgress(false);
 
-        this.noOk = false;
-
         this.et_buscar_album.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -88,10 +85,9 @@ public class MyXappesFragment extends Fragment {
     }
 
     private void searchXappes() {
-        this.noOk = false;
         this.xapes = new ArrayList<>();
 
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
@@ -120,21 +116,27 @@ public class MyXappesFragment extends Fragment {
                 for (XapesDO cava : cavesResult) {
                     xapes.add(cava);
                 }
-                noOk = true;
             }
-        }).start();
-        loadXappes();
+        });
+        t.start();
+        loadXappes(t);
     }
 
-    private void loadXappes() {
-        while (!this.noOk);
+    private void loadXappes(Thread t) {
+        try {
+            t.join();
 
-        this.imagesList = new ArrayList<>();
-        for (XapesDO cava : this.xapes) {
-            this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
+            this.imagesList = new ArrayList<>();
+            for (XapesDO cava : this.xapes) {
+                this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
+            }
+
+            this.gv_les_meves_xapes.setAdapter(new ImageAdapterGridView(this.getActivity()));
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }
 
-        this.gv_les_meves_xapes.setAdapter(new ImageAdapterGridView(this.getActivity()));
+
     }
 
     public class ImageAdapterGridView extends BaseAdapter {
