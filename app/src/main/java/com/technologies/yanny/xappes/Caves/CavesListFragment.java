@@ -23,7 +23,7 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.technologies.yanny.xappes.Database.DynamoDB;
 import com.technologies.yanny.xappes.R;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class CavesListFragment extends Fragment {
 
         this.gv_caves_filter = (GridView) this.getActivity().findViewById(R.id.gv_caves_filter);
 
-        ((HomeActivity) getActivity()).showProgress(false);
+        ((MenuActivity)getActivity()).showProgress(false);
         chargeIndex();
 
     }
@@ -81,7 +81,7 @@ public class CavesListFragment extends Fragment {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
 
 
-                ((HomeActivity) getActivity()).setProgressB(25);
+                ((MenuActivity)getActivity()).setProgressB(25);
 
                 Condition condition = new Condition()
                         .withComparisonOperator(ComparisonOperator.BEGINS_WITH)
@@ -91,13 +91,13 @@ public class CavesListFragment extends Fragment {
                 List<CavesDO> cavesResult = dynamoDBMapper.scan(CavesDO.class, scanExpression);
                 System.out.println(cavesResult.toString());
 
-                ((HomeActivity) getActivity()).setProgressB(55);
+                ((MenuActivity)getActivity()).setProgressB(55);
 
                 for (CavesDO cava : cavesResult) {
                     caves.add(cava);
                 }
 
-                ((HomeActivity) getActivity()).setProgressB(80);
+                ((MenuActivity)getActivity()).setProgressB(80);
 
                 FilteredCavaFragment fragment = new FilteredCavaFragment();
 
@@ -107,7 +107,7 @@ public class CavesListFragment extends Fragment {
 
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.fl_main_fragment, fragment)
+                        .add(R.id.fl_main_fragment, fragment)
                         .commit();
             }
         }).start();
@@ -118,7 +118,7 @@ public class CavesListFragment extends Fragment {
         this.gv_caves_filter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((HomeActivity) getActivity()).showProgress(true);
+                ((MenuActivity)getActivity()).showProgress(true);
                 if (!selected) {
                     selected = true;
                     String selectedItem = index[position];
@@ -189,6 +189,7 @@ public class CavesListFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        getActivity().getSupportFragmentManager().getFragments().remove(this);
     }
 
     public interface OnFragmentInteractionListener {

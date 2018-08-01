@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -28,7 +29,7 @@ import com.squareup.picasso.RequestCreator;
 import com.technologies.yanny.xappes.Caves.FilteredCavaFragment;
 import com.technologies.yanny.xappes.Database.DynamoDB;
 import com.technologies.yanny.xappes.R;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +70,7 @@ public class MyXappesFragment extends Fragment {
 
         this.dynamoDBMapper = new DynamoDB().myDynamoDB(this.getActivity());
 
-        ((HomeActivity) getActivity()).showProgress(false);
+        ((MenuActivity)getActivity()).showProgress(false);
 
         this.et_buscar_album.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -78,6 +79,23 @@ public class MyXappesFragment extends Fragment {
                     searchXappes();
                 }
                 return true;
+            }
+        });
+
+        this.gv_les_meves_xapes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                for (Fragment fragment : getActivity().getSupportFragmentManager().getFragments()) {
+                    if (fragment != null && fragment.getClass() == XappaFragment.class) getActivity().getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                }
+                XappaFragment newFragment = new XappaFragment();
+                Bundle args = new Bundle();
+                List<XapesDO> xappa = new ArrayList<>();
+                xappa.add(xapes.get(position));
+                args.putParcelableArrayList("xappa", (ArrayList) xappa);
+                args.putString("from", "myXappes");
+                newFragment.setArguments(args);
+                getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_main_fragment, newFragment).commit();
             }
         });
 
@@ -95,7 +113,7 @@ public class MyXappesFragment extends Fragment {
                 String value = et_buscar_album.getText().toString().trim().toLowerCase();
 
                 //String user = ((TextView) getActivity().findViewById(R.id.email)).getText().toString().trim().toLowerCase();
-                String user = ((HomeActivity) getActivity()).getUsuari();
+                String user = ((MenuActivity)getActivity()).getUsuari();
 
                 Condition condition;
 
@@ -163,7 +181,7 @@ public class MyXappesFragment extends Fragment {
 
             if (convertView == null) {
                 mImageView = new ImageView(mContext);
-                mImageView.setLayoutParams(new GridView.LayoutParams(300, 300));
+                mImageView.setLayoutParams(new GridView.LayoutParams(200, 200));
                 mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             } else {
                 mImageView = (ImageView) convertView;

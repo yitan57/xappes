@@ -73,8 +73,8 @@ public class IniciFragment extends Fragment {
         this.tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                ((HomeActivity) getActivity()).showProgress(true);
-                ((HomeActivity) getActivity()).setProgressB(50);
+                ((MenuActivity)getActivity()).showProgress(true);
+                ((MenuActivity)getActivity()).setProgressB(50);
                 getEntradas(tab.getText().toString());
             }
 
@@ -103,7 +103,7 @@ public class IniciFragment extends Fragment {
             }
             this.gv_content.setAdapter(new HomeAdapter(this.getActivity()));
 
-            ((HomeActivity) getActivity()).showProgress(false);
+            ((MenuActivity)getActivity()).showProgress(false);
         } catch (InterruptedException e) {
             Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }
@@ -114,7 +114,7 @@ public class IniciFragment extends Fragment {
         this.type = valueType;
         this.entradas = new ArrayList<>();
 
-        ((HomeActivity) getActivity()).setProgressB(75);
+        ((MenuActivity)getActivity()).setProgressB(75);
 
         Thread t = new Thread(new Runnable() {
             @Override
@@ -131,7 +131,7 @@ public class IniciFragment extends Fragment {
                 List<EntradasDO> cavesResult = dynamoDBMapper.scan(EntradasDO.class, scanExpression);
                 System.out.println(cavesResult.toString());
 
-                ((HomeActivity) getActivity()).setProgressB(85);
+                ((MenuActivity)getActivity()).setProgressB(85);
 
                 for (EntradasDO aEntrada : cavesResult) {
                     entradas.add(aEntrada);

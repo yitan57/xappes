@@ -14,7 +14,7 @@ import android.widget.TableLayout;
 
 import com.amazonaws.models.nosql.CavesDO;
 import com.technologies.yanny.xappes.R;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +49,11 @@ public class FilteredCavaFragment extends Fragment {
     public void onViewCreated(View view, Bundle bundle) {
         this.tl_caves_list_name = (TableLayout) getActivity().findViewById(R.id.tl_caves_list_name);
 
-        ((HomeActivity) getActivity()).showProgress(true);
-        ((HomeActivity) getActivity()).setProgressB(50);
+        ((MenuActivity)getActivity()).showProgress(true);
+        ((MenuActivity)getActivity()).setProgressB(50);
 
         generateList();
-        ((HomeActivity) getActivity()).showProgress(false);
+        ((MenuActivity)getActivity()).showProgress(false);
     }
 
     private void generateList() {

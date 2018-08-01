@@ -12,7 +12,7 @@ import com.technologies.yanny.xappes.R;
 import com.technologies.yanny.xappes.Xapes.CrearXapaFragment;
 import com.technologies.yanny.xappes.Xapes.MyXappesFragment;
 import com.technologies.yanny.xappes.Xapes.XapesListFragment;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 
 public class Cava {
     private String name;
@@ -39,13 +39,13 @@ public class Cava {
 
                     @Override
                     public void onClick(View v){
-                        ((HomeActivity) context).showProgress(true);
-                        ((HomeActivity) context).setProgressB(50);
+                        ((MenuActivity)context).showProgress(true);
+                        ((MenuActivity)context).setProgressB(50);
                         XapesListFragment newFragment = new XapesListFragment();
                         Bundle args = new Bundle();
                         args.putString("cava", name);
                         newFragment.setArguments(args);
-                        ((HomeActivity) context).setProgressB(90);
+                        ((MenuActivity)context).setProgressB(90);
                         fragment.beginTransaction().add(R.id.fl_main_fragment, newFragment).commit();
                     }
                 }

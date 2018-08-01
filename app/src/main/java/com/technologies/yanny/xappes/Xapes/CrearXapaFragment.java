@@ -35,7 +35,7 @@ import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.technologies.yanny.xappes.Caves.CavesListFragment;
 import com.technologies.yanny.xappes.Database.DynamoDB;
 import com.technologies.yanny.xappes.R;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 import com.technologies.yanny.xappes.utilities.Data.Caves;
 import com.technologies.yanny.xappes.utilities.S3Transfer;
 
@@ -130,7 +130,7 @@ public class CrearXapaFragment extends Fragment {
         this.iv_picture = (ImageView) this.getActivity().findViewById(R.id.iv_picture);
         this.iv_picture2 = (ImageView) this.getActivity().findViewById(R.id.iv_picture2);
 
-        ((HomeActivity) getActivity()).showProgress(false);
+        ((MenuActivity)getActivity()).showProgress(false);
 
         this.bt_buscar_xapa.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -172,6 +172,19 @@ public class CrearXapaFragment extends Fragment {
             }
         }
 
+        this.iv_picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadChargeXapasFragment();
+            }
+        });
+        this.iv_picture2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loadSelectCavaFragment();
+            }
+        });
+
     }
 
     private void toggleVisibleCamera(int view) {
@@ -183,18 +196,18 @@ public class CrearXapaFragment extends Fragment {
         setCava(this.cavaName);
         this.ll_la_meva_coleccio.setVisibility(View.VISIBLE);
         this.tv_codigo.setText(this.xapaId);
-        this.user = ((HomeActivity) getActivity()).getUsuari();
+        this.user = ((MenuActivity)getActivity()).getUsuari();
         this.codigoFinal = this.xapaId;
         this.tv_usuari.setText(this.user);
         getCava();
     }
 
     private void loadSelectCavaFragment() {
-        ((HomeActivity) getActivity()).showProgress(true);
-        ((HomeActivity) getActivity()).setProgressB(80);
+        ((MenuActivity)getActivity()).showProgress(true);
+        ((MenuActivity)getActivity()).setProgressB(80);
         this.getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fl_main, new CavesListFragment())
+                .add(R.id.fl_main, new CavesListFragment())
                 .commit();
     }
 
@@ -263,8 +276,8 @@ public class CrearXapaFragment extends Fragment {
     }
 
     private void loadChargeXapasFragment() {
-        ((HomeActivity) getActivity()).showProgress(true);
-        ((HomeActivity) getActivity()).setProgressB(50);
+        ((MenuActivity)getActivity()).showProgress(true);
+        ((MenuActivity)getActivity()).setProgressB(50);
         if (this.cavaName == null) getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_main_fragment, new XapesListFragment()).commit();
         else {
             XapesListFragment newFragment = new XapesListFragment();
@@ -325,7 +338,7 @@ public class CrearXapaFragment extends Fragment {
     private void prepareNewXappa() {
         this.ll_la_meva_coleccio.setVisibility(View.VISIBLE);
 
-        String user = ((HomeActivity) getActivity()).getUsuari();
+        String user = ((MenuActivity)getActivity()).getUsuari();
         this.tv_usuari.setText(user);
 
         int codigo = Integer.parseInt(getNumId())+1;

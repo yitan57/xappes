@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.RequestCreator;
 import com.technologies.yanny.xappes.Database.DynamoDB;
 import com.technologies.yanny.xappes.R;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,25 +60,25 @@ public class XapesListFragment extends Fragment {
     public void onViewCreated(View view, Bundle bundle) {
         this.gv_xapes = (GridView) getActivity().findViewById(R.id.gv_xapes);
 
-        ((HomeActivity) getActivity()).showProgress(true);
-        ((HomeActivity) getActivity()).setProgressB(35);
+        ((MenuActivity)getActivity()).showProgress(true);
+        ((MenuActivity)getActivity()).setProgressB(35);
 
         this.dynamoDBMapper = new DynamoDB().myDynamoDB(this.getActivity());
 
         this.imagesList = new ArrayList<>();
 
         searchXappes(this.cavaName);
-        ((HomeActivity) getActivity()).setProgressB(60);
+        ((MenuActivity)getActivity()).setProgressB(60);
 
         this.gv_xapes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((HomeActivity) getActivity()).showProgress(true);
-                String option = ((HomeActivity) getActivity()).getOption();
+                ((MenuActivity)getActivity()).showProgress(true);
+                String option = ((MenuActivity)getActivity()).getOption();
                 if (option.equals("crear")) {
                     CrearXapaFragment newFragment = new CrearXapaFragment();
                     Bundle args = new Bundle();
-                    ((HomeActivity) getActivity()).setProgressB(25);
+                    ((MenuActivity)getActivity()).setProgressB(25);
                     if (position >= xapes.size()) {
                         args.putString("xappaId", "-1");
                         args.putString("cava", cavaName);
@@ -91,7 +91,7 @@ public class XapesListFragment extends Fragment {
                         args.putString("xappaId", selectedCava.getXapesId());
 
                     }
-                    ((HomeActivity) getActivity()).setProgressB(70);
+                    ((MenuActivity)getActivity()).setProgressB(70);
                     newFragment.setArguments(args);
                     getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
 
@@ -99,6 +99,9 @@ public class XapesListFragment extends Fragment {
                     if (position >= xapes.size()) {
                         getActivity().onBackPressed();
                     } else {
+                        for (Fragment fragment : getActivity().getSupportFragmentManager().getFragments()) {
+                            if (fragment != null && fragment.getClass() == XappaFragment.class) getActivity().getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                        }
                         XappaFragment newFragment = new XappaFragment();
                         Bundle args = new Bundle();
                         List<XapesDO> xappa = new ArrayList<>();
@@ -143,16 +146,16 @@ public class XapesListFragment extends Fragment {
     private void loadXappes(Thread t) {
         try {
             t.join();
-            ((HomeActivity) getActivity()).setProgressB(90);
+            ((MenuActivity)getActivity()).setProgressB(90);
             this.imagesList = new ArrayList<>();
             for (XapesDO cava : this.xapes) {
                 System.out.println(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg");
                 this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
             }
-            if (((HomeActivity) getActivity()).getOption().equals("crear") && this.cavaName != null) this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "add.png"));
-            if (((HomeActivity) getActivity()).getOption().equals("buscar") && this.xapes.size() == 0)this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "noInfo.png"));
+            if (((MenuActivity)getActivity()).getOption().equals("crear") && this.cavaName != null) this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "add.png"));
+            if (((MenuActivity)getActivity()).getOption().equals("buscar") && this.xapes.size() == 0)this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "noInfo.png"));
             this.gv_xapes.setAdapter(new ImageAdapterGridView(this.getActivity()));
-            ((HomeActivity) getActivity()).showProgress(false);
+            ((MenuActivity)getActivity()).showProgress(false);
         } catch (InterruptedException e) {
             Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }
@@ -184,7 +187,12 @@ public class XapesListFragment extends Fragment {
 
             if (convertView == null) {
                 mImageView = new ImageView(mContext);
-                mImageView.setLayoutParams(new GridView.LayoutParams(300, 300));
+                String option = ((MenuActivity)getActivity()).getOption();
+                if (option.equals("crear")) {
+                    mImageView.setLayoutParams(new GridView.LayoutParams(300, 300));
+                } else {
+                    mImageView.setLayoutParams(new GridView.LayoutParams(200, 200));
+                }
                 mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             } else {
                 mImageView = (ImageView) convertView;

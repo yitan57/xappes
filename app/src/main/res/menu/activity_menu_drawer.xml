@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_home"
+            android:icon="@drawable/home"
+            android:title="Inici" />
+        <item
+            android:id="@+id/navigation_NovaPlaca"
+            android:icon="@drawable/chapa"
+            android:title="Afegir Placa" />
+        <item
+            android:id="@+id/navigation_xappes"
+            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:title="El meu Album" />
+        <item
+            android:id="@+id/navigation_caves"
+            android:icon="@drawable/cavas"
+            android:title="Menú de Caves" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/navigation_trobades"
+                android:icon="@drawable/trobada"
+                android:title="Trobades" />
+        </menu>
+    </item>
+
+</menu>

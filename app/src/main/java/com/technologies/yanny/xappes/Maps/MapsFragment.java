@@ -54,7 +54,7 @@ import com.technologies.yanny.xappes.Trobades.TrobadesFragment;
 import com.technologies.yanny.xappes.Xapes.CrearXapaFragment;
 import com.technologies.yanny.xappes.Xapes.XapesListFragment;
 import com.technologies.yanny.xappes.Xapes.XappaFragment;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 import com.technologies.yanny.xappes.utilities.Marca;
 
 import java.util.ArrayList;
@@ -99,8 +99,8 @@ public class MapsFragment extends Fragment{
     @Override
     public void onViewCreated(View view, Bundle bundle) {
 
-        ((HomeActivity) getActivity()).showProgress(true);
-        ((HomeActivity) getActivity()).setProgressB(35);
+        ((MenuActivity)getActivity()).showProgress(true);
+        ((MenuActivity)getActivity()).setProgressB(35);
 
         this.dynamoDBMapper = new DynamoDB().myDynamoDB(this.getActivity());
 
@@ -113,31 +113,31 @@ public class MapsFragment extends Fragment{
         this.bt_map.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((HomeActivity) getActivity()).showProgress(true);
+                ((MenuActivity)getActivity()).showProgress(true);
 
-                ((HomeActivity) getActivity()).setProgressB(70);
+                ((MenuActivity)getActivity()).setProgressB(70);
                 Intent newActivity = new Intent(getActivity().getApplicationContext(), MapsActivity.class);
                 newActivity.putParcelableArrayListExtra("selectedTrobada",(ArrayList) trobades);
                 startActivity(newActivity);
 
-                ((HomeActivity) getActivity()).showProgress(false);
+                ((MenuActivity)getActivity()).showProgress(false);
             }
         });
 
         this.gv_trobades.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ((HomeActivity) getActivity()).showProgress(true);
+                ((MenuActivity)getActivity()).showProgress(true);
 
                 List<TrobadesDO> selectedTrobada = new ArrayList<>();
                 selectedTrobada.add(trobades.get(position/2));
 
-                ((HomeActivity) getActivity()).setProgressB(70);
+                ((MenuActivity)getActivity()).setProgressB(70);
                 Intent newActivity = new Intent(getActivity().getApplicationContext(), MapsActivity.class);
                 newActivity.putParcelableArrayListExtra("selectedTrobada",(ArrayList) selectedTrobada);
                 startActivity(newActivity);
 
-                ((HomeActivity) getActivity()).showProgress(false);
+                ((MenuActivity)getActivity()).showProgress(false);
             }
         });
     }
@@ -152,7 +152,7 @@ public class MapsFragment extends Fragment{
                 List<TrobadesDO> trobadesResult = dynamoDBMapper.scan(TrobadesDO.class, scanExpression);
                 System.out.println(trobadesResult.toString());
 
-                ((HomeActivity) getActivity()).setProgressB(70);
+                ((MenuActivity)getActivity()).setProgressB(70);
 
                 for (TrobadesDO trobada : trobadesResult) {
                     trobades.add(trobada);
@@ -166,7 +166,7 @@ public class MapsFragment extends Fragment{
     private void loadTrobades(Thread t) {
         try {
             t.join();
-            ((HomeActivity) getActivity()).setProgressB(90);
+            ((MenuActivity)getActivity()).setProgressB(90);
 
             this.trobadesList = new String[this.trobades.size()*2];
             int j = 0;
@@ -177,7 +177,7 @@ public class MapsFragment extends Fragment{
             }
 
             this.gv_trobades.setAdapter(new TrobadesAdapter(this.getActivity()));
-            ((HomeActivity) getActivity()).showProgress(false);
+            ((MenuActivity)getActivity()).showProgress(false);
         } catch (InterruptedException e) {
             Toast.makeText(getActivity(),"Error", Toast.LENGTH_SHORT);
         }

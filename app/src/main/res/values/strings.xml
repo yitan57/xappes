@@ -34,4 +34,5 @@
 
     <string name="bucketURL">https://s3.us-east-2.amazonaws.com/xappes-userfiles-mobilehub-1241857271/xappes/</string>
     <string name="xappesDirectory">xappes/</string>
+    <string name="title_activity_menu">MenuActivity</string>
 </resources>

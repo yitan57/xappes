@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.amazonaws.models.nosql.XapesDO;
 import com.squareup.picasso.Picasso;
 import com.technologies.yanny.xappes.R;
-import com.technologies.yanny.xappes.main.HomeActivity;
+import com.technologies.yanny.xappes.main.MenuActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +35,8 @@ public class XappaFragment extends Fragment {
     private Button bt_exit;
     private Button bt_add;
 
+    private String type;
+
     public XappaFragment() {
 
     }
@@ -44,6 +46,7 @@ public class XappaFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             List<XapesDO> xappes = (ArrayList) getArguments().getParcelableArrayList("xappa");
+            this.type = getArguments().getString("from");
             this.xappa = xappes.get(0);
         }
     }
@@ -60,9 +63,13 @@ public class XappaFragment extends Fragment {
         this.bt_exit = (Button) getActivity().findViewById(R.id.bt_exit);
         this.bt_add = (Button) getActivity().findViewById(R.id.bt_add);
 
-        ((HomeActivity) getActivity()).showProgress(false);
+        ((MenuActivity)getActivity()).showProgress(false);
 
         chargeXappa(this.xappa);
+
+        if (this.type != null && this.type.equals("myXappes")) {
+            this.bt_add.setVisibility(View.INVISIBLE);
+        }
 
         this.bt_add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,12 +88,12 @@ public class XappaFragment extends Fragment {
     private void loadSelectCavaFragment(){
         CrearXapaFragment newFragment = new CrearXapaFragment();
         Bundle args = new Bundle();
-        ((HomeActivity) getActivity()).setProgressB(25);
+        ((MenuActivity)getActivity()).setProgressB(25);
 
         args.putString("cava", this.xappa.getCavaName());
         args.putString("xappaId", this.xappa.getXapesId());
 
-        ((HomeActivity) getActivity()).setProgressB(70);
+        ((MenuActivity)getActivity()).setProgressB(70);
         newFragment.setArguments(args);
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
     }
