@@ -62,6 +62,7 @@ public class IniciFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle bundle) {
+        ((MenuActivity) getActivity()).showProgress(false);
         this.fl_content_tabs = (FrameLayout) getActivity().findViewById(R.id.fl_content_tabs);
 
         this.tabs = (TabLayout) getActivity().findViewById(R.id.tabs);

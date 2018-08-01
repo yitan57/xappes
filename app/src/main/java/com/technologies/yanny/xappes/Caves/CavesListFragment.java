@@ -15,6 +15,7 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBScanExpression;
 import com.amazonaws.models.nosql.CavesDO;
@@ -74,7 +75,7 @@ public class CavesListFragment extends Fragment {
 
     private void chargeCaves(final String selected) {
 
-        new Thread(new Runnable() {
+        Thread nova = new Thread(new Runnable() {
             @Override
             public void run() {
                 caves = new ArrayList<>();
@@ -109,8 +110,17 @@ public class CavesListFragment extends Fragment {
                         .beginTransaction()
                         .add(R.id.fl_main_fragment, fragment)
                         .commit();
+
             }
-        }).start();
+        });
+        nova.start();
+        try {
+            nova.join();
+            this.selected = false;
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+            this.selected = false;
+        }
     }
 
     private void chargeIndex() {

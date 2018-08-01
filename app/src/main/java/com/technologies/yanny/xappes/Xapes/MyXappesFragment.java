@@ -146,7 +146,8 @@ public class MyXappesFragment extends Fragment {
 
             this.imagesList = new ArrayList<>();
             for (XapesDO cava : this.xapes) {
-                this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
+                this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXappa() + ".jpg"));
+                System.out.println(getResources().getString(R.string.bucketURL) + cava.getXappa() + ".jpg");
             }
 
             this.gv_les_meves_xapes.setAdapter(new ImageAdapterGridView(this.getActivity()));

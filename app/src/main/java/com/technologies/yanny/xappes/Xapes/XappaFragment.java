@@ -91,7 +91,7 @@ public class XappaFragment extends Fragment {
         ((MenuActivity)getActivity()).setProgressB(25);
 
         args.putString("cava", this.xappa.getCavaName());
-        args.putString("xappaId", this.xappa.getXapesId());
+        args.putString("xappaId", this.xappa.getXappa());
 
         ((MenuActivity)getActivity()).setProgressB(70);
         newFragment.setArguments(args);
@@ -101,20 +101,14 @@ public class XappaFragment extends Fragment {
     private void chargeXappa(XapesDO xappa) {
         this.tv_cava_Place.setText(xappa.getCavaPlace());
         this.tv_cavaName.setText(xappa.getCavaName());
-        this.tv_placaId.setText(xappa.getXapesId());
-        Picasso.get().load(getActivity().getResources().getString(R.string.bucketURL)+xappa.getXapesId()+".jpg").into(this.iv_placa);
+        this.tv_placaId.setText(xappa.getXappa());
+        Picasso.get().load(getActivity().getResources().getString(R.string.bucketURL)+xappa.getXappa()+".jpg").into(this.iv_placa);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_xappa, container, false);
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override

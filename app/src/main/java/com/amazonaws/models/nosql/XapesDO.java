@@ -18,6 +18,7 @@ public class XapesDO {
     private String _cavaName;
     private String _cavaPlace;
     private String _userId;
+    private String _xappa;
 
     @DynamoDBHashKey(attributeName = "xapesId")
     @DynamoDBAttribute(attributeName = "xapesId")
@@ -52,5 +53,12 @@ public class XapesDO {
     public void setUserId(final String _userId) {
         this._userId = _userId;
     }
+    @DynamoDBAttribute(attributeName = "xappa")
+    public String getXappa() {
+        return _xappa;
+    }
 
+    public void setXappa(final String _xappa) {
+        this._xappa = _xappa;
+    }
 }

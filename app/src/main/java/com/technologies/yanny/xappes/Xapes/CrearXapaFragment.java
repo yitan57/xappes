@@ -232,7 +232,6 @@ public class CrearXapaFragment extends Fragment {
         if (this.pictureFile != null) s3.uploadData(getActivity(), this.pictureFile, getResources().getString(R.string.xappesDirectory)+ id + ".jpg");
         else ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, new CrearXapaFragment()).commit();
     }
 
     private void setImage(String id) {
@@ -242,18 +241,31 @@ public class CrearXapaFragment extends Fragment {
     }
 
     public void saveNewXapa(String nameCava, String xapaId, String user, CavesDO cava, boolean increment) {
+        ((MenuActivity) getActivity()).showProgress(true);
+        ((MenuActivity) getActivity()).setProgressB(25);
         final XapesDO newsItem = new XapesDO();
 
-        newsItem.setXapesId(xapaId);
         newsItem.setCavaName(nameCava.toLowerCase());
+        newsItem.setXappa(xapaId);
+
+        if (increment) insertToGeneric(newsItem);
+
+        newsItem.setXapesId(user+xapaId);
         newsItem.setUserId(user);
 
-        new Thread(new Runnable() {
+        Thread nova = new Thread(new Runnable() {
             @Override
             public void run() {
                 dynamoDBMapper.save(newsItem);
             }
-        }).start();
+        });
+        nova.start();
+        try {
+            nova.join();
+            ((MenuActivity) getActivity()).setProgressB(75);
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+        }
 
         if (increment) {
             final CavesDO newsItemCava = cava;
@@ -263,16 +275,42 @@ public class CrearXapaFragment extends Fragment {
 
             newsItemCava.setNumXappes(String.valueOf(numXappes));
 
-            new Thread(new Runnable() {
+            Thread nova2 = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     dynamoDBMapper.save(newsItemCava);
                 }
-            }).start();
+            });
+            nova2.start();
+            try {
+                nova2.join();
+                ((MenuActivity) getActivity()).setProgressB(85);
+            } catch (InterruptedException e) {
+                Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+            }
+
+            saveImage(xapaId);
+            ((MenuActivity) getActivity()).setProgressB(95);
         }
+        ((MenuActivity) getActivity()).showProgress(false);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, new CrearXapaFragment()).commit();
+    }
 
-        saveImage(xapaId);
-
+    private void insertToGeneric(final XapesDO xapa) {
+        xapa.setUserId("generic");
+        xapa.setXapesId(xapa.getXappa());
+        Thread nova = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                dynamoDBMapper.save(xapa);
+            }
+        });
+        nova.start();
+        try {
+            nova.join();
+        } catch (InterruptedException e) {
+            Toast.makeText(getActivity(), "ERROR", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadChargeXapasFragment() {
@@ -286,7 +324,7 @@ public class CrearXapaFragment extends Fragment {
             args.putString("cava", this.cavaName);
             newFragment.setArguments(args);
 
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fl_main_fragment, newFragment).commit();
+            getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_main_fragment, newFragment).commit();
         }
     }
 

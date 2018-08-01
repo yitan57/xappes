@@ -88,7 +88,7 @@ public class XapesListFragment extends Fragment {
                         XapesDO selectedCava = xapes.get(position);
 
                         args.putString("cava", selectedCava.getCavaName());
-                        args.putString("xappaId", selectedCava.getXapesId());
+                        args.putString("xappaId", selectedCava.getXappa());
 
                     }
                     ((MenuActivity)getActivity()).setProgressB(70);
@@ -122,10 +122,15 @@ public class XapesListFragment extends Fragment {
             @Override
             public void run() {
                 DynamoDBScanExpression scanExpression = new DynamoDBScanExpression();
-                String user = "hflorido";
+
+                Condition condition;
+
+                condition = new Condition().withComparisonOperator(ComparisonOperator.EQ)
+                        .withAttributeValueList(new AttributeValue("generic"));
+                scanExpression.addFilterCondition("userId", condition);
 
                 if(cavaName != null) {
-                    Condition condition = new Condition()
+                    condition = new Condition()
                             .withComparisonOperator(ComparisonOperator.EQ)
                             .withAttributeValueList(new AttributeValue(cavaName.toLowerCase()));
                     scanExpression.addFilterCondition("cavaName", condition);
@@ -149,8 +154,8 @@ public class XapesListFragment extends Fragment {
             ((MenuActivity)getActivity()).setProgressB(90);
             this.imagesList = new ArrayList<>();
             for (XapesDO cava : this.xapes) {
-                System.out.println(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg");
-                this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXapesId() + ".jpg"));
+                System.out.println(getResources().getString(R.string.bucketURL) + cava.getXappa() + ".jpg");
+                this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + cava.getXappa() + ".jpg"));
             }
             if (((MenuActivity)getActivity()).getOption().equals("crear") && this.cavaName != null) this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "add.png"));
             if (((MenuActivity)getActivity()).getOption().equals("buscar") && this.xapes.size() == 0)this.imagesList.add(Picasso.get().load(getResources().getString(R.string.bucketURL) + "noInfo.png"));
